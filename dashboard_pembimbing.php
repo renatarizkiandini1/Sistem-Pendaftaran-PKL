@@ -28,22 +28,13 @@ $siswaBimbingan = $conn->query("SELECT p.*, u.username, s.nama_lengkap, s.kelas,
     <title>Dashboard Pembimbing</title>
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .card { background: var(--light); border-radius: 16px; padding: 24px; margin-top: 20px; }
-        .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--dark); }
-        table { width: 100%; border-collapse: collapse; }
-        th { padding-bottom: 10px; font-size: 12px; text-align: left; border-bottom: 1px solid var(--grey); color: var(--dark-grey); }
-        td { padding: 10px 0; font-size: 13px; border-bottom: 1px solid var(--grey); }
-        .btn { padding: 5px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; }
-        .btn-blue { background: var(--light-blue); color: var(--blue); }
-    </style>
 </head>
 <body>
 <?php sidebarPembimbing('dashboard_pembimbing'); ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Halo, <?= htmlspecialchars($pembimbing['nama_lengkap'] ?? $_SESSION['username']) ?>!</span>
+        <span class="nav-title">Halo, <?= htmlspecialchars($pembimbing['nama_lengkap'] ?? $_SESSION['username']) ?>!</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -66,8 +57,11 @@ $siswaBimbingan = $conn->query("SELECT p.*, u.username, s.nama_lengkap, s.kelas,
         </ul>
 
         <div class="card">
-            <h3>Siswa Bimbingan</h3>
-            <table>
+            <div class="card-header">
+                <h3>Siswa Bimbingan</h3>
+                <a href="siswa_bimbingan.php">Lihat semua →</a>
+            </div>
+            <div class="table-wrap">
                 <thead><tr><th>Nama Siswa</th><th>Kelas</th><th>Perusahaan</th><th>Aksi</th></tr></thead>
                 <tbody>
                     <?php if ($siswaBimbingan && $siswaBimbingan->num_rows > 0): ?>
@@ -77,8 +71,8 @@ $siswaBimbingan = $conn->query("SELECT p.*, u.username, s.nama_lengkap, s.kelas,
                             <td><?= htmlspecialchars($row['kelas'] ?? '-') ?></td>
                             <td><?= htmlspecialchars($row['nama_perusahaan']) ?></td>
                             <td>
-                                <a href="detail_logbook.php?id=<?= $row['id'] ?>" class="btn btn-blue">Logbook</a>
-                                <a href="beri_nilai.php?id=<?= $row['id'] ?>" class="btn btn-blue" style="margin-left:4px">Nilai</a>
+                                <a href="detail_logbook.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-ghost">Logbook</a>
+                                <a href="beri_nilai.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary" style="margin-left:4px">Nilai</a>
                             </td>
                         </tr>
                         <?php endwhile; ?>
@@ -87,6 +81,7 @@ $siswaBimbingan = $conn->query("SELECT p.*, u.username, s.nama_lengkap, s.kelas,
                     <?php endif; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </main>
 </section>

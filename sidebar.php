@@ -8,7 +8,7 @@ function sidebarSiswa($active = '') {
         'nilai_siswa'      => ['icon' => 'bxs-star',        'label' => 'Nilai'],
         'pengumuman_siswa' => ['icon' => 'bxs-bell',        'label' => 'Pengumuman'],
     ];
-    echo renderSidebar('bxs-graduation', 'Siswa', $menu, $active);
+    echo renderSidebar('bxs-graduation', 'Sistem PKL', $menu, $active);
 }
 
 function sidebarPembimbing($active = '') {
@@ -23,29 +23,32 @@ function sidebarPembimbing($active = '') {
 
 function sidebarAdmin($active = '') {
     $menu = [
-        'dashboard_admin'            => ['icon' => 'bxs-dashboard',  'label' => 'Dashboard'],
-        'admin_pendaftaran'          => ['icon' => 'bxs-file-doc',   'label' => 'Pendaftaran'],
-        'admin_perusahaan'           => ['icon' => 'bxs-buildings',  'label' => 'Perusahaan'],
-        'admin_siswa'                => ['icon' => 'bxs-group',      'label' => 'Siswa'],
-        'admin_pembimbing'           => ['icon' => 'bxs-user-badge', 'label' => 'Pembimbing'],
-        'admin_tugaskan_pembimbing'  => ['icon' => 'bxs-user-check', 'label' => 'Tugaskan Pembimbing'],
-        'admin_pengumuman'           => ['icon' => 'bxs-bell',       'label' => 'Pengumuman'],
-        'admin_sertifikat'           => ['icon' => 'bxs-award',      'label' => 'Sertifikat'],
+        'dashboard_admin'           => ['icon' => 'bxs-dashboard',  'label' => 'Dashboard'],
+        'admin_pendaftaran'         => ['icon' => 'bxs-file-doc',   'label' => 'Pendaftaran'],
+        'admin_perusahaan'          => ['icon' => 'bxs-buildings',  'label' => 'Perusahaan'],
+        'admin_siswa'               => ['icon' => 'bxs-group',      'label' => 'Siswa'],
+        'admin_pembimbing'          => ['icon' => 'bxs-user-badge', 'label' => 'Pembimbing'],
+        'admin_tugaskan_pembimbing' => ['icon' => 'bxs-user-check', 'label' => 'Tugaskan Pembimbing'],
+        'admin_pengumuman'          => ['icon' => 'bxs-bell',       'label' => 'Pengumuman'],
+        'admin_sertifikat'          => ['icon' => 'bxs-award',      'label' => 'Sertifikat'],
     ];
-    echo renderSidebar('bxs-shield-alt-2', 'Admin', $menu, $active);
+    echo renderSidebar('bxs-shield-alt-2', 'Admin PKL', $menu, $active);
 }
 
 function renderSidebar($brandIcon, $brandLabel, $menu, $active) {
-    $html = "<section id='sidebar'>";
+    $html  = "<div class='sidebar-overlay'></div>";
+    $html .= "<section id='sidebar'>";
     $html .= "<a href='#' class='brand'><i class='bx {$brandIcon}'></i><span class='text'>{$brandLabel}</span></a>";
     $html .= "<ul class='side-menu top'>";
     foreach ($menu as $file => $item) {
         $isActive = $active === $file ? 'class="active"' : '';
-        $html .= "<li {$isActive}><a href='{$file}.php'><i class='bx {$item['icon']}'></i><span class='text'>{$item['label']}</span></a></li>";
+        $html .= "<li {$isActive}><a href='{$file}.php' data-tooltip='{$item['label']}'><i class='bx {$item['icon']}'></i><span class='text'>{$item['label']}</span></a></li>";
     }
-    $html .= "</ul><ul class='side-menu'>";
-    $html .= "<li><a href='logout.php' class='logout'><i class='bx bxs-log-out-circle'></i><span class='text'>Logout</span></a></li>";
-    $html .= "</ul></section>";
+    $html .= "</ul>";
+    $html .= "<ul class='side-menu bottom'>";
+    $html .= "<li><a href='logout.php' class='logout' data-tooltip='Logout'><i class='bx bxs-log-out-circle'></i><span class='text'>Logout</span></a></li>";
+    $html .= "</ul>";
+    $html .= "</section>";
     return $html;
 }
 ?>

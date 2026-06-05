@@ -21,26 +21,13 @@ $recent = $conn->query("SELECT p.*, u.username, s.nama_lengkap, pr.nama_perusaha
     <title>Dashboard Admin</title>
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .card { background: var(--light); border-radius: 16px; padding: 24px; margin-top: 20px; }
-        .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--dark); display: flex; justify-content: space-between; align-items: center; }
-        .card h3 a { font-size: 12px; font-weight: 600; color: var(--blue); }
-        table { width: 100%; border-collapse: collapse; }
-        th { padding-bottom: 10px; font-size: 12px; text-align: left; border-bottom: 1px solid var(--grey); color: var(--dark-grey); }
-        td { padding: 10px 0; font-size: 13px; border-bottom: 1px solid var(--grey); }
-        .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; }
-        .status-badge.menunggu { background: var(--orange); }
-        .status-badge.diterima { background: var(--blue); }
-        .status-badge.ditolak  { background: var(--red); }
-        .status-badge.selesai  { background: #27ae60; }
-    </style>
 </head>
 <body>
 <?php sidebarAdmin('dashboard_admin'); ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Selamat datang, <?= htmlspecialchars($_SESSION['username']) ?>!</span>
+        <span class="nav-title">Selamat datang, <?= htmlspecialchars($_SESSION['username']) ?>!</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -66,8 +53,11 @@ $recent = $conn->query("SELECT p.*, u.username, s.nama_lengkap, pr.nama_perusaha
         </ul>
 
         <div class="card">
-            <h3>Pendaftaran Terbaru <a href="admin_pendaftaran.php">Lihat semua →</a></h3>
-            <table>
+            <div class="card-header">
+                <h3>Pendaftaran Terbaru</h3>
+                <a href="admin_pendaftaran.php">Lihat semua →</a>
+            </div>
+            <div class="table-wrap">
                 <thead><tr><th>Siswa</th><th>Perusahaan</th><th>Tanggal Daftar</th><th>Status</th></tr></thead>
                 <tbody>
                     <?php if ($recent && $recent->num_rows > 0): ?>
@@ -76,7 +66,7 @@ $recent = $conn->query("SELECT p.*, u.username, s.nama_lengkap, pr.nama_perusaha
                             <td><?= htmlspecialchars($row['nama_lengkap'] ?? $row['username']) ?></td>
                             <td><?= htmlspecialchars($row['nama_perusahaan']) ?></td>
                             <td><?= date('d M Y', strtotime($row['created_at'])) ?></td>
-                            <td><span class="status-badge <?= strtolower($row['status']) ?>"><?= $row['status'] ?></span></td>
+                            <td><span class="badge <?= strtolower($row['status']) ?>"><?= $row['status'] ?></span></td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -84,6 +74,7 @@ $recent = $conn->query("SELECT p.*, u.username, s.nama_lengkap, pr.nama_perusaha
                     <?php endif; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </main>
 </section>

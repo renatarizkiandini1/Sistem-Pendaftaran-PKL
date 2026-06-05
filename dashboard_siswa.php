@@ -35,40 +35,13 @@ $pengumuman = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC LI
     <title>Dashboard Siswa</title>
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .card { background: var(--light); border-radius: 16px; padding: 24px; margin-top: 20px; }
-        .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--dark); display: flex; align-items: center; gap: 8px; }
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-        .info-item label { font-size: 11px; color: var(--dark-grey); display: block; text-transform: uppercase; }
-        .info-item span { font-size: 14px; font-weight: 600; color: var(--dark); }
-        .status-badge { padding: 4px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; color: white; display: inline-block; }
-        .status-badge.menunggu { background: var(--orange); }
-        .status-badge.diterima { background: var(--blue); }
-        .status-badge.ditolak  { background: var(--red); }
-        .status-badge.selesai  { background: #27ae60; }
-        .btn { padding: 8px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; }
-        .btn-primary { background: var(--blue); color: white; }
-        .btn-danger  { background: var(--red); color: white; margin-left: 6px; }
-        .alert { padding: 12px 16px; border-radius: 10px; margin-top: 16px; font-size: 13px; }
-        .alert-warning { background: var(--light-yellow); color: #856404; }
-        .progress-bar { background: var(--grey); border-radius: 20px; height: 10px; margin-top: 6px; }
-        .progress-fill { background: var(--blue); border-radius: 20px; height: 100%; transition: width .3s; }
-        .pengumuman-item { padding: 12px 0; border-bottom: 1px solid var(--grey); }
-        .pengumuman-item:last-child { border-bottom: none; }
-        .pengumuman-item h4 { font-size: 14px; font-weight: 600; color: var(--dark); }
-        .pengumuman-item small { color: var(--dark-grey); font-size: 12px; }
-        .nilai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-        .nilai-item { background: var(--grey); border-radius: 10px; padding: 14px; text-align: center; }
-        .nilai-item .angka { font-size: 28px; font-weight: 700; color: var(--blue); }
-        .nilai-item .label { font-size: 11px; color: var(--dark-grey); margin-top: 4px; }
-    </style>
 </head>
 <body>
 <?php sidebarSiswa('dashboard_siswa'); ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Halo, <?= htmlspecialchars($siswa['nama_lengkap'] ?? $_SESSION['username']) ?>!</span>
+        <span class="nav-title">Halo, <?= htmlspecialchars($siswa['nama_lengkap'] ?? $_SESSION['username']) ?>!</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -90,7 +63,7 @@ $pengumuman = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC LI
 
         <!-- STATUS PKL -->
         <div class="card">
-            <h3><i class='bx bxs-file-doc'></i> Status PKL</h3>
+            <div class="card-header"><h3><i class='bx bxs-file-doc'></i> Status PKL</h3></div>
             <?php if ($pkl): ?>
             <div class="info-grid">
                 <div class="info-item"><label>Perusahaan</label><span><?= htmlspecialchars($pkl['nama_perusahaan']) ?></span></div>
@@ -99,24 +72,24 @@ $pengumuman = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC LI
                 <div class="info-item"><label>Status</label><span class="status-badge <?= strtolower($pkl['status']) ?>"><?= $pkl['status'] ?></span></div>
             </div>
             <?php if ($pkl['catatan']): ?>
-            <div class="alert alert-warning" style="margin-top:12px"><b>Catatan Admin:</b> <?= htmlspecialchars($pkl['catatan']) ?></div>
+            <div class="alert alert-warning" style="margin-top:16px"><i class='bx bxs-info-circle'></i><span><b>Catatan Admin:</b> <?= htmlspecialchars($pkl['catatan']) ?></span></div>
             <?php endif; ?>
             <?php if ($pkl['status'] === 'Menunggu'): ?>
-            <div style="margin-top:12px">
-                <a href="daftar_pkl.php?edit=1" class="btn btn-primary">Edit Pendaftaran</a>
-                <a href="hapus_pendaftaran.php" class="btn btn-danger" onclick="return confirm('Yakin hapus pendaftaran?')">Hapus</a>
+            <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+                <a href="daftar_pkl.php?edit=1" class="btn btn-primary"><i class='bx bxs-edit'></i> Edit</a>
+                <a href="hapus_pendaftaran.php" class="btn btn-danger" onclick="return confirm('Yakin hapus pendaftaran?')"><i class='bx bxs-trash'></i> Hapus</a>
             </div>
             <?php endif; ?>
             <?php else: ?>
             <p style="color:var(--dark-grey);font-size:14px">Kamu belum mendaftar PKL.</p>
-            <a href="daftar_pkl.php" class="btn btn-primary" style="margin-top:12px">Daftar PKL Sekarang</a>
+            <a href="daftar_pkl.php" class="btn btn-primary" style="margin-top:16px"><i class='bx bxs-file-plus'></i> Daftar PKL Sekarang</a>
             <?php endif; ?>
         </div>
 
         <!-- PROGRESS LOGBOOK -->
         <?php if ($pkl && $pkl['status'] === 'Diterima'): ?>
         <div class="card">
-            <h3><i class='bx bxs-book-alt'></i> Progress Logbook</h3>
+            <div class="card-header"><h3><i class='bx bxs-book-alt'></i> Progress Logbook</h3><a href="logbook.php">Lihat semua →</a></div>
             <?php
             $mulai   = new DateTime($pkl['tanggal_mulai']);
             $selesai = new DateTime($pkl['tanggal_selesai']);
@@ -126,12 +99,12 @@ $pengumuman = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC LI
             <p style="font-size:13px;color:var(--dark-grey);margin-bottom:8px"><?= $totalLogbook ?> entri logbook dari estimasi <?= $totalHari ?> hari kerja</p>
             <div class="progress-bar"><div class="progress-fill" style="width:<?= $persen ?>%"></div></div>
             <p style="font-size:12px;color:var(--dark-grey);margin-top:6px"><?= $persen ?>% selesai</p>
-            <a href="logbook.php" class="btn btn-primary" style="margin-top:12px">Isi Logbook</a>
+            <a href="logbook.php" class="btn btn-primary" style="margin-top:16px"><i class='bx bxs-edit'></i> Isi Logbook</a>
         </div>
 
         <!-- NILAI -->
         <div class="card">
-            <h3><i class='bx bxs-star'></i> Nilai Sementara</h3>
+            <div class="card-header"><h3><i class='bx bxs-star'></i> Nilai Sementara</h3><a href="nilai_siswa.php">Detail →</a></div>
             <?php if ($nilai): ?>
             <div class="nilai-grid">
                 <div class="nilai-item"><div class="angka"><?= $nilai['nilai_kedisiplinan'] ?></div><div class="label">Kedisiplinan</div></div>
@@ -148,7 +121,7 @@ $pengumuman = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC LI
 
         <!-- PENGUMUMAN -->
         <div class="card">
-            <h3><i class='bx bxs-bell'></i> Pengumuman Terbaru</h3>
+            <div class="card-header"><h3><i class='bx bxs-bell'></i> Pengumuman Terbaru</h3><a href="pengumuman_siswa.php">Lihat semua →</a></div>
             <?php if ($pengumuman && $pengumuman->num_rows > 0): ?>
                 <?php while ($row = $pengumuman->fetch_assoc()): ?>
                 <div class="pengumuman-item">
