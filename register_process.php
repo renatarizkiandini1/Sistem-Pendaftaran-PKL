@@ -2,33 +2,40 @@
 session_start();
 include('db.php');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username     = trim($_POST['username']);
+    $password     = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $nama_lengkap = $_POST['nama_lengkap'];
+    $nisn         = $_POST['nisn'];
+    $kelas        = $_POST['kelas'];
+    $jurusan      = $_POST['jurusan'];
+    $no_telp      = $_POST['no_telp'] ?? '';
 
-    // Cek apakah username sudah ada
-    $stmt = $conn->prepare("SELECT id FROM user WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        echo "<script>alert('Username sudah digunakan!');window.location.href='register.html';</script>";
-    } else {
-        $stmt->close();
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $role = 'siswa';
-
-        $stmt = $conn->prepare("INSERT INTO user (username, password, role) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $hashedPassword, $role);
-
-        if ($stmt->execute()) {
-            echo "<script>alert('Registrasi berhasil! Silakan login.');window.location.href='index.html';</script>";
-        } else {
-            echo "<script>alert('Registrasi gagal, coba lagi.');window.location.href='register.html';</script>";
-        }
+    // Cek username
+    $cek = $conn->prepare("SELECT id FROM user WHERE username = ?");
+    $cek->bind_param("s", $username);
+    $cek->execute();
+    $cek->store_result();
+    if ($cek->num_rows > 0) {
+        header("Location: register.html?error=username_taken");
+        exit();
     }
+    $cek->close();
+
+    // Insert user
+    $stmt = $conn->prepare("INSERT INTO user (username, password, role) VALUES (?, ?, 'siswa')");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $user_id = $conn->insert_id;
     $stmt->close();
+
+    // Insert profil siswa
+    $stmt = $conn->prepare("INSERT INTO siswa (user_id, nama_lengkap, nisn, kelas, jurusan, no_telp) VALUES (?,?,?,?,?,?)");
+    $stmt->bind_param("isssss", $user_id, $nama_lengkap, $nisn, $kelas, $jurusan, $no_telp);
+    $stmt->execute();
+    $stmt->close();
+
+    header("Location: index.html");
+    exit();
 }
-$conn->close();
 ?>
