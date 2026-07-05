@@ -1,0 +1,61 @@
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# PHP
+*.php~
+.php_cs.cache
+
+# Uploads
+uploads/
+uploads/surat/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+vendor/
+node_modules/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Database backups
+*.sql
+*.sql.gz
+
+# Compiled files
+*.class
+*.o
+*.so
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz
