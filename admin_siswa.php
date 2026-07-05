@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') { header("Location: index.html"); exit(); }
 include('db.php');
+include('sidebar.php');
 
 // Tambah siswa
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'tambah') {
@@ -91,7 +92,24 @@ if (isset($_GET['hapus'])) {
     exit();
 }
 
-$siswaList = $conn->query("SELECT u.*, s.nama_lengkap, s.nisn, s.kelas, s.jurusan, s.no_telp, s.alamat FROM user u LEFT JOIN siswa s ON s.user_id = u.id WHERE u.role='siswa' ORDER BY u.id DESC");
+$search = $_GET['search'] ?? '';
+$whereSQL = '';
+if ($search) {
+    $s = $conn->real_escape_string($search);
+    $whereSQL = "WHERE u.role='siswa' AND (u.username LIKE '%$s%' OR s.nama_lengkap LIKE '%$s%' OR s.nisn LIKE '%$s%' OR s.kelas LIKE '%$s%')";
+} else {
+    $whereSQL = "WHERE u.role='siswa'";
+}
+
+$page    = max(1, (int)($_GET['page'] ?? 1));
+$perPage = 15;
+$offset  = ($page - 1) * $perPage;
+
+$totalQ  = $conn->query("SELECT COUNT(*) as t FROM user u LEFT JOIN siswa s ON s.user_id = u.id $whereSQL");
+$total   = $totalQ ? (int)$totalQ->fetch_assoc()['t'] : 0;
+$pages   = ceil($total / $perPage);
+
+$siswaList = $conn->query("SELECT u.*, s.nama_lengkap, s.nisn, s.kelas, s.jurusan, s.no_telp, s.alamat FROM user u LEFT JOIN siswa s ON s.user_id = u.id $whereSQL ORDER BY u.id DESC LIMIT $perPage OFFSET $offset");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -125,19 +143,7 @@ $siswaList = $conn->query("SELECT u.*, s.nama_lengkap, s.nisn, s.kelas, s.jurusa
     </style>
 </head>
 <body>
-<section id="sidebar">
-    <a href="#" class="brand"><i class='bx bxs-shield-alt-2'></i><span class="text">Admin</span></a>
-    <ul class="side-menu top">
-        <li><a href="dashboard_admin.php"><i class='bx bxs-dashboard'></i><span class="text">Dashboard</span></a></li>
-        <li><a href="admin_pendaftaran.php"><i class='bx bxs-file-doc'></i><span class="text">Pendaftaran</span></a></li>
-        <li><a href="admin_perusahaan.php"><i class='bx bxs-buildings'></i><span class="text">Perusahaan</span></a></li>
-        <li class="active"><a href="admin_siswa.php"><i class='bx bxs-group'></i><span class="text">Siswa</span></a></li>
-    </ul>
-    <ul class="side-menu">
-        <li><a href="logout.php" class="logout"><i class='bx bxs-log-out-circle'></i><span class="text">Logout</span></a></li>
-    </ul>
-</section>
-
+<?php sidebarAdmin('admin_siswa'); ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
@@ -159,8 +165,15 @@ $siswaList = $conn->query("SELECT u.*, s.nama_lengkap, s.nisn, s.kelas, s.jurusa
 
         <div class="table-wrap">
             <div class="head-bar">
-                <h3>Daftar Siswa</h3>
-                <button class="btn-tambah" onclick="openTambah()"><i class='bx bx-plus'></i> Tambah Siswa</button>
+                <h3>Daftar Siswa (<?= $total ?>)</h3>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <form method="GET" style="display:flex;gap:8px;">
+                        <input type="text" name="search" placeholder="Cari nama, NISN, kelas..." value="<?= htmlspecialchars($search) ?>" style="padding:8px 12px;border:1px solid var(--grey);border-radius:8px;font-size:13px;min-width:220px;">
+                        <button type="submit" style="padding:8px 16px;background:var(--blue);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Cari</button>
+                        <?php if($search): ?><a href="admin_siswa.php" style="padding:8px 12px;background:var(--grey);border-radius:8px;font-size:13px;text-decoration:none;color:var(--dark);">Reset</a><?php endif; ?>
+                    </form>
+                    <button class="btn-tambah" onclick="openTambah()"><i class='bx bx-plus'></i> Tambah Siswa</button>
+                </div>
             </div>
             <table>
                 <thead>
@@ -197,6 +210,20 @@ $siswaList = $conn->query("SELECT u.*, s.nama_lengkap, s.nisn, s.kelas, s.jurusa
                     <?php endif; ?>
                 </tbody>
             </table>
+
+            <?php if ($pages > 1): ?>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">← Prev</a>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $pages; $i++): ?>
+                    <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid <?= $i==$page ? 'var(--blue)' : 'var(--grey)' ?>;background:<?= $i==$page ? 'var(--blue)' : 'white' ?>;color:<?= $i==$page ? 'white' : 'var(--dark)' ?>;border-radius:8px;text-decoration:none;font-size:13px;"><?= $i ?></a>
+                <?php endfor; ?>
+                <?php if ($page < $pages): ?>
+                    <a href="?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">Next →</a>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 </section>

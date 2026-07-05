@@ -5,54 +5,439 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem PKL</title>
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #3C91E6, #1a5fa8); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .login-box h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
-        .login-box p { text-align: center; color: #888; font-size: 13px; margin-bottom: 28px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
-        .form-group input { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; transition: border .2s; }
-        .form-group input:focus { border-color: #3C91E6; }
-        .btn-login { width: 100%; padding: 12px; background: #3C91E6; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-        .btn-login:hover { background: #1a5fa8; }
-        .register-link { text-align: center; margin-top: 16px; font-size: 13px; color: #888; }
-        .register-link a { color: #3C91E6; font-weight: 600; }
-        .alert-error { background: #fde8e8; color: #c0392b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .logo i { font-size: 48px; color: #3C91E6; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        /* Background Decoration */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            bottom: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-box { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 45px 40px; 
+            width: 100%; 
+            max-width: 420px; 
+            box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        
+        /* Logo & Branding */
+        .logo { 
+            text-align: center; 
+            margin-bottom: 24px; 
+        }
+        
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .logo-icon i { 
+            font-size: 36px; 
+            color: white;
+        }
+        
+        .login-box h2 { 
+            text-align: center; 
+            color: #2d3748; 
+            margin-bottom: 6px; 
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .login-box p { 
+            text-align: center; 
+            color: #718096; 
+            font-size: 14px; 
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+        
+        /* Alert Messages */
+        .alert-error, .alert-success { 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            font-size: 13px; 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeInUp 0.4s ease;
+        }
+        
+        .alert-error {
+            background: #fee; 
+            color: #c53030;
+            border-left: 4px solid #c53030;
+        }
+        
+        .alert-success {
+            background: #e6fffa; 
+            color: #047857;
+            border-left: 4px solid #047857;
+        }
+        
+        .alert-error i, .alert-success i { font-size: 18px; }
+        
+        /* Form Styling */
+        .form-group { 
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #4a5568; 
+            margin-bottom: 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: #a0aec0;
+            font-size: 18px;
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+        
+        .form-group input { 
+            width: 100%; 
+            padding: 12px 14px 12px 42px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            outline: none; 
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-group input:focus { 
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group input:focus + .input-icon {
+            color: #667eea;
+        }
+        
+        /* Password Toggle */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            color: #a0aec0;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s;
+            z-index: 2;
+        }
+        
+        .toggle-password:hover {
+            color: #667eea;
+        }
+        
+        /* Button */
+        .btn-login { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 15px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .btn-login .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-left: 8px;
+        }
+        
+        .btn-login.loading .spinner {
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Links */
+        .register-link { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 14px; 
+            color: #718096;
+        }
+        
+        .register-link a { 
+            color: #667eea; 
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .register-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: #cbd5e0;
+            font-size: 13px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .divider span {
+            padding: 0 12px;
+            color: #a0aec0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 35px 25px;
+            }
+            
+            .login-box h2 {
+                font-size: 22px;
+            }
+            
+            body::before,
+            body::after {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <div class="logo"><i class='bx bxs-graduation'></i></div>
-        <h2>Sistem PKL</h2>
-        <p>Masuk ke akun kamu</p>
-
-        <?php if (isset($_GET['error'])): ?>
-        <div class="alert-error"><i class='bx bxs-error'></i>
-            <?php
-            $err = $_GET['error'];
-            if ($err === 'wrong_password') echo 'Password salah!';
-            elseif ($err === 'user_not_found') echo 'Username tidak ditemukan!';
-            else echo 'Terjadi kesalahan, coba lagi.';
-            ?>
+        <!-- Logo & Branding -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class='bx bxs-graduation'></i>
+            </div>
+            <h2>Sistem PKL</h2>
+            <p>Masuk ke akun kamu untuk melanjutkan</p>
         </div>
-        <?php endif; ?>
 
-        <form action="login.php" method="POST">
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Login Form -->
+        <form action="login.php" method="POST" id="loginForm">
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Masukkan username" required>
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Masukkan username" 
+                        autocomplete="username"
+                        required
+                    >
+                    <i class='bx bxs-user input-icon'></i>
+                </div>
             </div>
+            
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Masukkan password" required>
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Masukkan password" 
+                        autocomplete="current-password"
+                        required
+                    >
+                    <i class='bx bxs-lock-alt input-icon'></i>
+                    <i class='bx bx-show toggle-password' id="togglePassword"></i>
+                </div>
             </div>
-            <button type="submit" class="btn-login">Login</button>
+            
+            <button type="submit" class="btn-login" id="btnLogin">
+                <span>Masuk</span>
+                <span class="spinner"></span>
+            </button>
         </form>
-        <div class="register-link">Belum punya akun? <a href="register.html">Daftar di sini</a></div>
+        
+        <div class="divider">
+            <span>atau</span>
+        </div>
+        
+        <div class="register-link">
+            Belum punya akun? <a href="register.html">Daftar sebagai siswa</a>
+        </div>
     </div>
+    
+    <script>
+        // Show/Hide Password
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('bx-show');
+            this.classList.toggle('bx-hide');
+        });
+        
+        // Form Loading State
+        const loginForm = document.getElementById('loginForm');
+        const btnLogin = document.getElementById('btnLogin');
+        
+        loginForm.addEventListener('submit', function() {
+            btnLogin.classList.add('loading');
+            btnLogin.querySelector('span').textContent = 'Memproses...';
+        });
+        
+        // Display Alert from URL Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const success = urlParams.get('success');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        if (error) {
+            let message = 'Terjadi kesalahan, coba lagi.';
+            if (error === 'wrong_password') message = 'Password yang Anda masukkan salah. Silakan coba lagi.';
+            else if (error === 'user_not_found') message = 'Username tidak ditemukan. Periksa kembali username Anda.';
+            
+            alertContainer.innerHTML = `
+                <div class="alert-error">
+                    <i class='bx bxs-error-circle'></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+        
+        if (success === 'registered') {
+            alertContainer.innerHTML = `
+                <div class="alert-success">
+                    <i class='bx bxs-check-circle'></i>
+                    <span>Pendaftaran berhasil! Silakan login dengan akun Anda.</span>
+                </div>
+            `;
+        }
+        
+        // Input Focus Animation
+        const inputs = document.querySelectorAll('.form-group input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('.input-icon').style.color = '#667eea';
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.querySelector('.input-icon').style.color = '#a0aec0';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

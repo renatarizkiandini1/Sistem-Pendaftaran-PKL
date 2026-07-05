@@ -14,12 +14,7 @@ $list = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC");
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
     <style>
-        .card { background:var(--light); border-radius:16px; padding:24px; margin-top:24px; }
-        .item { border-bottom:1px solid var(--grey); padding:16px 0; }
-        .item:last-child { border-bottom:none; }
-        .item h4 { font-size:15px; font-weight:700; color:var(--dark); margin-bottom:6px; }
-        .item p  { font-size:14px; color:var(--dark); white-space:pre-wrap; line-height:1.7; }
-        .item small { font-size:12px; color:var(--dark-grey); display:block; margin-top:8px; }
+        .pengumuman-full p { font-size:14px; color:var(--dark); white-space:pre-wrap; line-height:1.7; }
     </style>
 </head>
 <body>
@@ -27,7 +22,7 @@ $list = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC");
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Pengumuman</span>
+        <span class="nav-title">Pengumuman</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -45,14 +40,16 @@ $list = $conn->query("SELECT * FROM pengumuman ORDER BY created_at DESC");
         <div class="card">
             <?php if ($list && $list->num_rows > 0): ?>
                 <?php while ($row = $list->fetch_assoc()): ?>
-                <div class="item">
-                    <h4><?= htmlspecialchars($row['judul']) ?></h4>
-                    <p><?= htmlspecialchars($row['isi']) ?></p>
-                    <small><i class='bx bxs-calendar'></i> <?= date('d M Y H:i', strtotime($row['created_at'])) ?></small>
+                <div class="pengumuman-item">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
+                        <h4><?= htmlspecialchars($row['judul']) ?></h4>
+                        <small style="white-space:nowrap;color:var(--dark-grey)"><i class='bx bxs-calendar'></i> <?= date('d M Y H:i', strtotime($row['created_at'])) ?></small>
+                    </div>
+                    <p class="pengumuman-full"><?= nl2br(htmlspecialchars($row['isi'])) ?></p>
                 </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p style="color:var(--dark-grey);font-size:14px">Belum ada pengumuman.</p>
+                <div class="empty-state-sm"><i class='bx bxs-bell-off'></i><p>Belum ada pengumuman.</p></div>
             <?php endif; ?>
         </div>
     </main>

@@ -66,13 +66,7 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
     <style>
-        .form-card { background: var(--light); border-radius: 16px; padding: 32px; margin-top: 24px; max-width: 560px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--dark); }
-        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--blue); }
-        .btn-submit { background: var(--blue); color: white; border: none; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .alert-error { background: #fde8e8; color: #c0392b; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; }
+        .form-card { max-width: 560px; }
         .info-box { background: var(--grey); border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 13px; display: none; color: var(--dark); }
     </style>
 </head>
@@ -81,7 +75,7 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600"><?= $isEdit ? 'Edit Pendaftaran PKL' : 'Daftar PKL' ?></span>
+        <span class="nav-title"><?= $isEdit ? 'Edit Pendaftaran PKL' : 'Daftar PKL' ?></span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -96,9 +90,9 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
                 </ul>
             </div>
         </div>
-        <div class="form-card">
+        <div class="form-card card">
             <?php if ($error): ?>
-            <div class="alert-error"><i class='bx bxs-error'></i> <?= $error ?></div>
+            <div class="alert alert-error"><i class='bx bxs-error'></i> <?= $error ?></div>
             <?php endif; ?>
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
@@ -136,7 +130,12 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
                     <?php endif; ?>
                     <small style="display:block;color:var(--dark-grey);margin-top:4px">Format: PDF, DOC, JPG, PNG (maks. 10MB)</small>
                 </div>
-                <button type="submit" class="btn-submit"><?= $isEdit ? 'Update Pendaftaran' : 'Kirim Pendaftaran' ?></button>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Update Pendaftaran' : 'Kirim Pendaftaran' ?></button>
+                    <?php if ($isEdit): ?>
+                    <a href="hapus_pendaftaran.php" class="btn btn-danger" onclick="return confirm('Yakin hapus pendaftaran ini?')">Hapus Pendaftaran</a>
+                    <?php endif; ?>
+                </div>
             </form>
         </div>
     </main>

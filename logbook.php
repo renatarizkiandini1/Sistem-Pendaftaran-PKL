@@ -6,13 +6,21 @@ include('sidebar.php');
 
 $user_id = $_SESSION['user_id'];
 
-$stmt = $conn->prepare("SELECT * FROM pendaftaran WHERE user_id = ? AND status = 'Diterima'");
+$stmt = $conn->prepare("SELECT * FROM pendaftaran WHERE user_id = ? AND status IN ('Diterima','Sedang PKL','Menunggu Penilaian')");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $pkl = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-if (!$pkl) { header("Location: dashboard_siswa.php"); exit(); }
+if (!$pkl) {
+    $stmt2 = $conn->prepare("SELECT status FROM pendaftaran WHERE user_id = ?");
+    $stmt2->bind_param("i", $user_id);
+    $stmt2->execute();
+    $pendaftaran = $stmt2->get_result()->fetch_assoc();
+    $stmt2->close();
+    if (!$pendaftaran) { header("Location: dashboard_siswa.php"); exit(); }
+    $pesanRedirect = 'Status PKL kamu saat ini <b>'.$pendaftaran['status'].'</b>. Logbook hanya bisa diisi saat status <b>Sedang PKL</b>.';
+}
 
 $pesan = '';
 $error = '';
@@ -61,25 +69,9 @@ $logbooks = $conn->query("SELECT * FROM logbook WHERE pendaftaran_id = {$pkl['id
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
     <style>
-        .layout { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
-        .form-card { background: var(--light); border-radius: 16px; padding: 24px; flex: 1; min-width: 280px; max-width: 360px; }
-        .table-card { background: var(--light); border-radius: 16px; padding: 24px; flex: 2; min-width: 300px; overflow-x: auto; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--dark); }
-        .form-group input, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; outline: none; }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
-        .btn-submit { background: var(--blue); color: white; border: none; padding: 9px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; }
-        table { width: 100%; border-collapse: collapse; }
-        th { padding-bottom: 12px; font-size: 12px; text-align: left; border-bottom: 1px solid var(--grey); color: var(--dark-grey); text-transform: uppercase; }
-        td { padding: 12px 0; font-size: 13px; vertical-align: top; border-bottom: 1px solid var(--grey); }
-        .badge-verif { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; }
-        .badge-verif.menunggu { background: var(--orange); }
-        .badge-verif.diverifikasi { background: #27ae60; }
-        .btn-hapus { background: #fde8e8; color: var(--red); padding: 3px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .alert-success { background: var(--light-blue); color: #0c5460; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
-        .alert-error { background: #fde8e8; color: #c0392b; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
-        h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--dark); }
+        .logbook-layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
         .catatan-pembimbing { font-size: 12px; color: var(--blue); margin-top: 4px; }
+        @media (max-width: 900px) { .logbook-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -87,7 +79,7 @@ $logbooks = $conn->query("SELECT * FROM logbook WHERE pendaftaran_id = {$pkl['id
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Logbook PKL</span>
+        <span class="nav-title">Logbook PKL</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -103,28 +95,38 @@ $logbooks = $conn->query("SELECT * FROM logbook WHERE pendaftaran_id = {$pkl['id
             </div>
         </div>
 
-        <div class="layout">
-            <div class="form-card">
-                <h3>Tambah Aktivitas</h3>
-                <?php if ($pesan === 'success'): ?><div class="alert-success"><i class='bx bxs-check-circle'></i> Logbook berhasil disimpan!</div><?php endif; ?>
-                <?php if ($error): ?><div class="alert-error"><i class='bx bxs-error'></i> <?= $error ?></div><?php endif; ?>
+        <div class="logbook-layout">
+            <div class="card">
+                <div class="card-header"><h3><i class='bx bxs-edit'></i> Tambah Aktivitas</h3></div>
+                <?php if ($pesan === 'success'): ?><div class="alert alert-success"><i class='bx bxs-check-circle'></i> Logbook berhasil disimpan!</div><?php endif; ?>
+                <?php if ($error): ?><div class="alert alert-error"><i class='bx bxs-error'></i> <?= $error ?></div><?php endif; ?>
+                <?php if (!empty($pesanRedirect)): ?>
+                <div class="alert alert-warning"><i class='bx bxs-error'></i> <span><?= $pesanRedirect ?></span></div>
+                <?php elseif ($pkl['status'] !== 'Sedang PKL'): ?>
+                <div class="alert alert-warning"><i class='bx bxs-error'></i> <span>Logbook hanya bisa diisi saat status <b>Sedang PKL</b>. Status kamu saat ini: <b><?= $pkl['status'] ?></b></span></div>
+                <?php else: ?>
                 <form method="POST">
                     <input type="hidden" name="action" value="tambah">
                     <div class="form-group">
                         <label>Tanggal</label>
                         <input type="date" name="tanggal" value="<?= date('Y-m-d') ?>"
-                            min="<?= $pkl['tanggal_mulai'] ?>" max="<?= $pkl['tanggal_selesai'] ?>" required>
+                            min="<?= $pkl['tanggal_mulai'] ?>" max="<?= $pkl['tanggal_selesai'] ?>" 
+                            <?= $pkl['status'] !== 'Sedang PKL' ? 'disabled' : '' ?> required>
                     </div>
                     <div class="form-group">
                         <label>Aktivitas</label>
-                        <textarea name="aktivitas" rows="5" placeholder="Ceritakan aktivitas hari ini..." required></textarea>
+                        <textarea name="aktivitas" rows="5" placeholder="Ceritakan aktivitas hari ini..." 
+                            <?= $pkl['status'] !== 'Sedang PKL' ? 'disabled' : '' ?> required></textarea>
                     </div>
-                    <button type="submit" class="btn-submit">Simpan</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%" 
+                        <?= $pkl['status'] !== 'Sedang PKL' ? 'disabled' : '' ?>>Simpan</button>
                 </form>
+                <?php endif; ?>
             </div>
 
-            <div class="table-card">
-                <h3>Riwayat Logbook</h3>
+            <div class="card">
+                <div class="card-header"><h3><i class='bx bxs-book-alt'></i> Riwayat Logbook</h3></div>
+                <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -145,19 +147,20 @@ $logbooks = $conn->query("SELECT * FROM logbook WHERE pendaftaran_id = {$pkl['id
                                     <div class="catatan-pembimbing"><i class='bx bxs-comment'></i> <?= htmlspecialchars($row['catatan_pembimbing']) ?></div>
                                     <?php endif; ?>
                                 </td>
-                                <td><span class="badge-verif <?= strtolower($row['status_verifikasi']) ?>"><?= $row['status_verifikasi'] ?></span></td>
+                                <td><span class="badge <?= strtolower($row['status_verifikasi']) ?>"><?= $row['status_verifikasi'] ?></span></td>
                                 <td>
                                     <?php if ($row['status_verifikasi'] === 'Menunggu'): ?>
-                                    <a href="?hapus=<?= $row['id'] ?>" class="btn-hapus" onclick="return confirm('Hapus logbook ini?')"><i class='bx bxs-trash'></i></a>
+                                    <a href="?hapus=<?= $row['id'] ?>" class="btn btn-danger btn-sm btn-icon" onclick="return confirm('Hapus logbook ini?')"><i class='bx bxs-trash'></i></a>
                                     <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
-                            <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--dark-grey)">Belum ada logbook.</td></tr>
+                            <tr><td colspan="4" style="text-align:center;padding:28px;color:var(--dark-grey)">Belum ada logbook.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </main>

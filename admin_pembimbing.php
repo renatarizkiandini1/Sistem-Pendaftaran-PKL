@@ -57,9 +57,12 @@ if (isset($_GET['hapus'])) {
     header("Location: admin_pembimbing.php"); exit();
 }
 
+$search = $_GET['search'] ?? '';
+$whereSQL = $search ? "WHERE pb.nama_lengkap LIKE '%" . $conn->real_escape_string($search) . "%' OR pb.keahlian LIKE '%" . $conn->real_escape_string($search) . "%'" : '';
+
 $list = $conn->query("SELECT pb.*, u.username,
     (SELECT COUNT(*) FROM pendaftaran WHERE pembimbing_id=pb.id AND status='Diterima') as terpakai
-    FROM pembimbing pb JOIN user u ON pb.user_id=u.id ORDER BY pb.nama_lengkap");
+    FROM pembimbing pb JOIN user u ON pb.user_id=u.id $whereSQL ORDER BY pb.nama_lengkap");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -114,8 +117,15 @@ $list = $conn->query("SELECT pb.*, u.username,
 
         <div class="table-card">
             <div class="head-bar">
-                <h3 style="font-size:15px;font-weight:700">Daftar Pembimbing</h3>
-                <button class="btn-tambah" onclick="document.getElementById('modalTambah').classList.add('show')"><i class='bx bx-plus'></i> Tambah</button>
+                <h3 style="font-size:15px;font-weight:700">Daftar Pembimbing (<?= $list ? $list->num_rows : 0 ?>)</h3>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <form method="GET" style="display:flex;gap:8px;">
+                        <input type="text" name="search" placeholder="Cari nama atau keahlian..." value="<?= htmlspecialchars($search) ?>" style="padding:7px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;min-width:200px;">
+                        <button type="submit" style="padding:7px 14px;background:var(--blue);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Cari</button>
+                        <?php if($search): ?><a href="admin_pembimbing.php" style="padding:7px 12px;background:var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">Reset</a><?php endif; ?>
+                    </form>
+                    <button class="btn-tambah" onclick="document.getElementById('modalTambah').classList.add('show')"><i class='bx bx-plus'></i> Tambah</button>
+                </div>
             </div>
             <table>
                 <thead><tr><th>No</th><th>Nama</th><th>NIP</th><th>Keahlian</th><th>Kuota</th><th>Username</th><th>Aksi</th></tr></thead>

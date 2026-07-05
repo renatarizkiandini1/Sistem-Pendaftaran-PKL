@@ -17,11 +17,6 @@ $data = $stmt->get_result()->fetch_assoc(); $stmt->close();
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
     <style>
-        .card { background:var(--light); border-radius:16px; padding:32px; margin-top:24px; max-width:560px; }
-        .nilai-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:16px; margin-bottom:16px; }
-        .nilai-item { background:var(--grey); border-radius:12px; padding:16px; text-align:center; }
-        .nilai-item .angka { font-size:32px; font-weight:700; color:var(--blue); }
-        .nilai-item .label { font-size:12px; color:var(--dark-grey); margin-top:4px; }
         .nilai-akhir { text-align:center; padding:20px; background:var(--light-blue); border-radius:12px; margin-top:16px; }
         .nilai-akhir .angka { font-size:48px; font-weight:700; color:var(--blue); }
         .nilai-akhir .label { font-size:14px; color:var(--dark-grey); }
@@ -33,7 +28,7 @@ $data = $stmt->get_result()->fetch_assoc(); $stmt->close();
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Nilai PKL</span>
+        <span class="nav-title">Nilai PKL</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -48,7 +43,7 @@ $data = $stmt->get_result()->fetch_assoc(); $stmt->close();
                 </ul>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="max-width:600px">
             <?php if ($data && $data['nilai_akhir']): ?>
             <p style="font-size:13px;color:var(--dark-grey);margin-bottom:16px">Pembimbing: <b><?= htmlspecialchars($data['nama_pembimbing'] ?? '-') ?></b> | Status: <b><?= $data['status'] ?></b></p>
             <div class="nilai-grid">
@@ -62,7 +57,7 @@ $data = $stmt->get_result()->fetch_assoc(); $stmt->close();
             <div class="catatan-box"><b>Catatan Pembimbing:</b><br><?= nl2br(htmlspecialchars($data['catatan'])) ?></div>
             <?php endif; ?>
             <?php else: ?>
-            <p style="color:var(--dark-grey);font-size:14px">Belum ada penilaian dari pembimbing.</p>
+            <div class="empty-state-sm"><i class='bx bxs-star'></i><p>Belum ada penilaian dari pembimbing.</p></div>
             <?php endif; ?>
         </div>
     </main>

@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') { header("Location: index.html"); exit(); }
 include('db.php');
+include('sidebar.php');
 
 $pesan = '';
 
@@ -50,7 +51,15 @@ if (isset($_GET['edit'])) {
     $stmt->close();
 }
 
-$perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
+$search     = $_GET['search'] ?? '';
+$page       = max(1, (int)($_GET['page'] ?? 1));
+$perPage    = 10;
+$offset     = ($page - 1) * $perPage;
+$whereSQL   = $search ? "WHERE nama_perusahaan LIKE '%" . $conn->real_escape_string($search) . "%' OR bidang_usaha LIKE '%" . $conn->real_escape_string($search) . "%'" : '';
+$totalQ     = $conn->query("SELECT COUNT(*) as t FROM perusahaan $whereSQL");
+$total      = $totalQ ? (int)$totalQ->fetch_assoc()['t'] : 0;
+$pages      = ceil($total / $perPage);
+$perusahaan = $conn->query("SELECT * FROM perusahaan $whereSQL ORDER BY nama_perusahaan LIMIT $perPage OFFSET $offset");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -81,19 +90,7 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
     </style>
 </head>
 <body>
-<section id="sidebar">
-    <a href="#" class="brand"><i class='bx bxs-shield-alt-2'></i><span class="text">Admin</span></a>
-    <ul class="side-menu top">
-        <li><a href="dashboard_admin.php"><i class='bx bxs-dashboard'></i><span class="text">Dashboard</span></a></li>
-        <li><a href="admin_pendaftaran.php"><i class='bx bxs-file-doc'></i><span class="text">Pendaftaran</span></a></li>
-        <li class="active"><a href="admin_perusahaan.php"><i class='bx bxs-buildings'></i><span class="text">Perusahaan</span></a></li>
-        <li><a href="admin_siswa.php"><i class='bx bxs-group'></i><span class="text">Siswa</span></a></li>
-    </ul>
-    <ul class="side-menu">
-        <li><a href="logout.php" class="logout"><i class='bx bxs-log-out-circle'></i><span class="text">Logout</span></a></li>
-    </ul>
-</section>
-
+<?php sidebarAdmin('admin_perusahaan'); ?>
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
@@ -152,7 +149,14 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
 
             <!-- TABLE -->
             <div class="table-wrap">
-                <h3>Daftar Perusahaan</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                    <h3>Daftar Perusahaan (<?= $total ?>)</h3>
+                    <form method="GET" style="display:flex;gap:8px;">
+                        <input type="text" name="search" placeholder="Cari nama atau bidang..." value="<?= htmlspecialchars($search) ?>" style="padding:7px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;min-width:200px;">
+                        <button type="submit" style="padding:7px 16px;background:var(--blue);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Cari</button>
+                        <?php if($search): ?><a href="admin_perusahaan.php" style="padding:7px 12px;background:var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">Reset</a><?php endif; ?>
+                    </form>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -184,6 +188,20 @@ $perusahaan = $conn->query("SELECT * FROM perusahaan ORDER BY nama_perusahaan");
                         <?php endif; ?>
                     </tbody>
                 </table>
+
+                <?php if ($pages > 1): ?>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">← Prev</a>
+                    <?php endif; ?>
+                    <?php for ($i=1; $i<=$pages; $i++): ?>
+                        <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid <?= $i==$page?'var(--blue)':'var(--grey)'?>;background:<?= $i==$page?'var(--blue)':'white'?>;color:<?= $i==$page?'white':'var(--dark)'?>;border-radius:8px;text-decoration:none;font-size:13px;"><?= $i ?></a>
+                    <?php endfor; ?>
+                    <?php if ($page < $pages): ?>
+                        <a href="?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>" style="padding:6px 14px;border:1px solid var(--grey);border-radius:8px;text-decoration:none;color:var(--dark);font-size:13px;">Next →</a>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </main>

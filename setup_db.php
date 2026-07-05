@@ -106,6 +106,18 @@ foreach ($tables as $sql) {
     }
 }
 
+// Tambah kolom yang mungkin belum ada (ALTER jika perlu)
+$migrations = [
+    "ALTER TABLE pendaftaran ADD COLUMN pembimbing_id INT DEFAULT NULL AFTER perusahaan_id",
+    "ALTER TABLE pendaftaran ADD FOREIGN KEY (pembimbing_id) REFERENCES pembimbing(id) ON DELETE SET NULL",
+    "ALTER TABLE pendaftaran ADD COLUMN surat_penerimaan VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE pendaftaran ADD COLUMN sertifikat VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE pendaftaran ADD COLUMN catatan TEXT DEFAULT NULL",
+];
+foreach ($migrations as $sql) {
+    $conn->query($sql); // abaikan error jika kolom sudah ada
+}
+
 // Buat akun default jika belum ada
 $akun = [
     ['admin',      'admin123',      'admin'],

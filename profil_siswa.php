@@ -39,13 +39,7 @@ $siswa = $conn->query("SELECT * FROM siswa WHERE user_id = $user_id")->fetch_ass
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
     <style>
-        .form-card { background: var(--light); border-radius: 16px; padding: 32px; margin-top: 24px; max-width: 560px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--dark); }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
-        .btn-submit { background: var(--blue); color: white; border: none; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .alert-success { background: var(--light-blue); color: #0c5460; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; }
+        .form-card { max-width: 560px; }
     </style>
 </head>
 <body>
@@ -53,7 +47,7 @@ $siswa = $conn->query("SELECT * FROM siswa WHERE user_id = $user_id")->fetch_ass
 <section id="content">
     <nav>
         <i class='bx bx-menu'></i>
-        <span style="font-weight:600">Profil Saya</span>
+        <span class="nav-title">Profil Saya</span>
         <input type="checkbox" id="switch-mode" hidden>
         <label for="switch-mode" class="switch-mode"></label>
     </nav>
@@ -68,9 +62,9 @@ $siswa = $conn->query("SELECT * FROM siswa WHERE user_id = $user_id")->fetch_ass
                 </ul>
             </div>
         </div>
-        <div class="form-card">
+        <div class="form-card card">
             <?php if ($pesan === 'success'): ?>
-            <div class="alert-success"><i class='bx bxs-check-circle'></i> Profil berhasil disimpan!</div>
+            <div class="alert alert-success"><i class='bx bxs-check-circle'></i> Profil berhasil disimpan!</div>
             <?php endif; ?>
             <form method="POST">
                 <div class="form-group"><label>Nama Lengkap</label><input type="text" name="nama_lengkap" value="<?= htmlspecialchars($siswa['nama_lengkap'] ?? '') ?>" required></div>
@@ -79,7 +73,7 @@ $siswa = $conn->query("SELECT * FROM siswa WHERE user_id = $user_id")->fetch_ass
                 <div class="form-group"><label>Jurusan</label><input type="text" name="jurusan" value="<?= htmlspecialchars($siswa['jurusan'] ?? '') ?>" required></div>
                 <div class="form-group"><label>No. Telepon</label><input type="text" name="no_telp" value="<?= htmlspecialchars($siswa['no_telp'] ?? '') ?>"></div>
                 <div class="form-group"><label>Alamat</label><textarea name="alamat" rows="3"><?= htmlspecialchars($siswa['alamat'] ?? '') ?></textarea></div>
-                <button type="submit" class="btn-submit">Simpan Profil</button>
+                <button type="submit" class="btn btn-primary">Simpan Profil</button>
             </form>
         </div>
     </main>
